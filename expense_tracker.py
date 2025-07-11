@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.expense_dataframe = pd.DataFrame()
 
         # create a layout for the expense tracker
         central_widget = QWidget()
@@ -21,6 +22,7 @@ class MainWindow(QMainWindow):
         # create what is displayed when "Upload Transactions" is clicked
         upload_button = QPushButton("Upload")
         self.stack.addWidget(upload_button)
+        upload_button.clicked.connect(self.load_new_expenses)
 
         temp_button = QPushButton("Temporary")
         self.stack.addWidget(temp_button)
@@ -40,6 +42,10 @@ class MainWindow(QMainWindow):
 
         # add the stack to the main window
         main_layout.addWidget(self.stack)
+
+    def load_new_expenses(self):
+        self.expense_dataframe = pd.read_csv("transactions.csv")
+        print(self.expense_dataframe.head())
         
 
 class Expense:
@@ -56,11 +62,7 @@ class Expense:
     
     def get_amount(self):
         return self.amnt
-    
 
-def load_new_expenses():
-    expense_dataframe = pd.read_csv("transactions.csv")
-    print(expense_dataframe.head())
 
 def load_old_expenses():
     expense_dataframe = pd.read_csv("")
