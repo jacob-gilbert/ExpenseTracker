@@ -5,6 +5,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.expense_dataframe = pd.DataFrame()
+        self.curr_index = 0
+        self.curr_expense = "Load Expenses"
 
         # create a layout for the expense tracker
         central_widget = QWidget()
@@ -24,6 +26,28 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(upload_button)
         upload_button.clicked.connect(self.load_new_expenses)
 
+        # layout for sort visuals
+        sort_grid_widget = QWidget()
+        sort_grid_layout = QGridLayout()
+        sort_grid_widget.setLayout(sort_grid_layout)
+        self.stack.addWidget(sort_grid_widget)
+
+        # create text for current expense
+        curr_ex_label = QLabel(self.curr_expense)
+        sort_grid_layout.addWidget(curr_ex_label, 0, 1)
+
+        # create new cateogory for sorting
+        new_cat = QPushButton("Create Category")
+        sort_grid_layout.addWidget(new_cat, 1, 0)
+
+        # skip button for sort
+        skip_button = QPushButton("Skip")
+        sort_grid_layout.addWidget(skip_button, 1, 1)
+
+        # delete button for sort
+        delete_button = QPushButton("Delete")
+        sort_grid_layout.addWidget(delete_button, 1, 2)
+
         temp_button = QPushButton("Temporary")
         self.stack.addWidget(temp_button)
 
@@ -34,9 +58,13 @@ class MainWindow(QMainWindow):
         new_transactions_button.clicked.connect(lambda: self.stack.setCurrentIndex(0)) # connects the button being clicked to changing what is displayed from the stack
         sidebar.addWidget(new_transactions_button) # adds the button to the sidebar layout
 
+        new_sort_button = QPushButton("Sort")
+        new_sort_button.clicked.connect(lambda: self.stack.setCurrentIndex(1))
+        sidebar.addWidget(new_sort_button)
+
         other_temp_button = QPushButton("Temporary")
         sidebar.addWidget(other_temp_button)
-        other_temp_button.clicked.connect(lambda: self.stack.setCurrentIndex(1))
+        other_temp_button.clicked.connect(lambda: self.stack.setCurrentIndex(2))
 
         sidebar.addStretch() # pushes everything to the top
 
