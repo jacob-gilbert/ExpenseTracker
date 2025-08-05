@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
         # delete button for sort
         delete_button = QPushButton("Delete")
         sort_grid_layout.addWidget(delete_button, 1, 2)
+        delete_button.clicked.connect(self.delete_current_expense)
 
         temp_button = QPushButton("Temporary")
         self.stack.addWidget(temp_button)
@@ -107,6 +108,14 @@ class MainWindow(QMainWindow):
             self.set_current_expense()
         else:
             print("Expense Dataframe is empty!")
+
+    # make sure there are expenses and update the current index after the delete
+    def delete_current_expense(self):
+        if len(self.expense_dataframe) != 0:
+            self.expense_dataframe.drop(self.curr_index, inplace=True) # deleting row without creating new dataframe
+
+            # update the current expense
+            self.set_current_expense()
         
 
 class Expense:
