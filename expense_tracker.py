@@ -87,8 +87,9 @@ class MainWindow(QMainWindow):
     def set_current_expense(self):
         if len(self.expense_dataframe) != 0:
             temp_exp = self.expense_dataframe.iloc[self.curr_index] # this gets the current expense out of row self.current_index
-            #self.curr_expense = temp_exp
-            self.curr_expense = f"Date: {temp_exp[0]}  Category: {temp_exp[4]}\nDescription: {temp_exp[3]}\nDebit/Credit: {temp_exp[5]}/{temp_exp[6]}"
+            
+            # the .setText() function can read html so added underlines to key words, must use <br> instead of /n for new lines since it is looking for html
+            self.curr_expense = f"<u>Date</u>: {temp_exp[0]}<br><u>Category</u>: {temp_exp[4]}<br><u>Description</u>: {temp_exp[3]}<br><u>Debit/Credit</u>: {temp_exp[5]}/{temp_exp[6]}"
 
             # reset the text of the label
             self.curr_ex_label.setText(self.curr_expense)
