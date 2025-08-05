@@ -107,15 +107,19 @@ class MainWindow(QMainWindow):
             # now update the current expense with the new index
             self.set_current_expense()
         else:
-            print("Expense Dataframe is empty!")
+            print("Expense Dataframe is Empty, Cannot Skip")
 
     # make sure there are expenses and update the current index after the delete
     def delete_current_expense(self):
         if len(self.expense_dataframe) != 0:
             self.expense_dataframe.drop(self.curr_index, inplace=True) # deleting row without creating new dataframe
+            self.expense_dataframe.reset_index(drop=True, inplace=True) # creates new indices for the dataframe inplace and drops old indices
+            print(self.expense_dataframe.head())
 
             # update the current expense
             self.set_current_expense()
+        else:
+            print("Expense Dataframe is Empty, Cannot Delete")
         
 
 class Expense:
