@@ -53,10 +53,10 @@ class MainWindow(QMainWindow):
         delete_button.clicked.connect(self.delete_current_expense)
 
         # user will categorize the expense, so give them a drop down list of categories to choose 
-        cat_combo_box = QComboBox()
-        sort_grid_layout.addWidget(cat_combo_box, 1, 0)
+        self.cat_combo_box = QComboBox()
+        sort_grid_layout.addWidget(self.cat_combo_box, 1, 0)
         try:
-            cat_combo_box.addItems(load_categories())
+            self.cat_combo_box.addItems(load_categories())
         except:
             pass
 
@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
             new_len_exp_df = len(self.expense_dataframe)
             if new_len_exp_df == 0: # dataframe is empty
                 self.curr_expense = "Load Expenses"
-                
+
                 # reset the text of the label
                 self.curr_ex_label.setText(self.curr_expense)
                 return
@@ -141,6 +141,24 @@ class MainWindow(QMainWindow):
             self.set_current_expense()
         else:
             print("Expense Dataframe is Empty, Cannot Delete")
+
+
+    # Override closeEvent to export to JSON on close
+    def closeEvent(self, event):
+        selected_option = self.cat_combo_box.currentText()
+        data_to_save = {
+            "categories": selected_option
+        }
+        
+        try:
+            with open("output.json", "w") as f:
+                json.dump(data_to_save, f, indent=4)
+            print("Data saved to output.json")
+        except Exception as e:
+            print(f"Failed to save data: {e}")
+
+        # Accept the close event
+        event.accept()
         
 
 class Expense:
