@@ -1,5 +1,6 @@
 import pandas as pd
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton
+import json
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -39,17 +40,25 @@ class MainWindow(QMainWindow):
 
         # create new cateogory for sorting
         new_cat = QPushButton("Create Category")
-        sort_grid_layout.addWidget(new_cat, 1, 0)
+        sort_grid_layout.addWidget(new_cat, 2, 0)
 
         # skip button for sort
         skip_button = QPushButton("Skip")
-        sort_grid_layout.addWidget(skip_button, 1, 1)
+        sort_grid_layout.addWidget(skip_button, 2, 1)
         skip_button.clicked.connect(self.skip_to_next_row_df)
 
         # delete button for sort
         delete_button = QPushButton("Delete")
-        sort_grid_layout.addWidget(delete_button, 1, 2)
+        sort_grid_layout.addWidget(delete_button, 2, 2)
         delete_button.clicked.connect(self.delete_current_expense)
+
+        # user will categorize the expense, so give them a drop down list of categories to choose 
+        cat_combo_box = QComboBox()
+        sort_grid_layout.addWidget(cat_combo_box, 1, 0)
+        try:
+            cat_combo_box.addItems(load_categories())
+        except:
+            pass
 
         temp_button = QPushButton("Temporary")
         self.stack.addWidget(temp_button)
@@ -116,6 +125,18 @@ class MainWindow(QMainWindow):
             self.expense_dataframe.reset_index(drop=True, inplace=True) # creates new indices for the dataframe inplace and drops old indices
             print(self.expense_dataframe.head())
 
+            # if the end of the dataframe is deleted the index will be out of bounds or if the dataframe becomes empty
+            new_len_exp_df = len(self.expense_dataframe)
+            if new_len_exp_df == 0: # dataframe is empty
+                self.curr_expense = "Load Expenses"
+                
+                # reset the text of the label
+                self.curr_ex_label.setText(self.curr_expense)
+                return
+            
+            if new_len_exp_df == self.curr_index: # index out of range due to delete
+                self.curr_index -= 1
+
             # update the current expense
             self.set_current_expense()
         else:
@@ -143,6 +164,10 @@ def load_old_expenses():
 
 def save_expenses(analyzed_expenses):
     analyzed_expenses.to_csv("", index = False)
+
+def load_categories():
+    with open("categories.json", "r") as f:
+        date = json.load(f)
 
 
 
