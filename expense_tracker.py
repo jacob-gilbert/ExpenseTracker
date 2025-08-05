@@ -131,6 +131,7 @@ class MainWindow(QMainWindow):
         if ok and new_cat: # if user clicked OK and didn't leave textbox blank
             self.cat_combo_box.addItems([new_cat])
 
+
     # make sure there are expenses and update the current index after the delete
     def delete_current_expense(self):
         if len(self.expense_dataframe) != 0:
