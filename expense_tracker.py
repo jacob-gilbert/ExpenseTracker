@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
         # create new cateogory for sorting
         new_cat = QPushButton("Create Category")
         sort_grid_layout.addWidget(new_cat, 2, 0)
+        new_cat.clicked.connect(self.create_new_cat)
 
         # skip button for sort
         skip_button = QPushButton("Skip")
@@ -123,6 +124,12 @@ class MainWindow(QMainWindow):
         else:
             print("Expense Dataframe is Empty, Cannot Skip")
 
+
+    # prompt user for input to create a new category to sort expenses into
+    def create_new_cat(self):
+        new_cat, ok = QInputDialog.getText(self, "Create New Category", "Enter name of new category:") # ok is a boolean that shows whether the user clicked OK or cancel
+        if ok and new_cat: # if user clicked OK and didn't leave textbox blank
+            self.cat_combo_box.addItems([new_cat])
 
     # make sure there are expenses and update the current index after the delete
     def delete_current_expense(self):
