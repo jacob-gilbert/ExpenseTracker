@@ -44,6 +44,7 @@ class MainWindow(QMainWindow):
         # skip button for sort
         skip_button = QPushButton("Skip")
         sort_grid_layout.addWidget(skip_button, 1, 1)
+        skip_button.clicked.connect(self.skip_to_next_row_df)
 
         # delete button for sort
         delete_button = QPushButton("Delete")
@@ -89,7 +90,7 @@ class MainWindow(QMainWindow):
             temp_exp = self.expense_dataframe.iloc[self.curr_index] # this gets the current expense out of row self.current_index
             
             # the .setText() function can read html so added underlines to key words, must use <br> instead of /n for new lines since it is looking for html
-            self.curr_expense = f"<u>Date</u>: {temp_exp[0]}<br><u>Category</u>: {temp_exp[4]}<br><u>Description</u>: {temp_exp[3]}<br><u>Debit/Credit</u>: {temp_exp[5]}/{temp_exp[6]}"
+            self.curr_expense = f"<u>Date</u>: {temp_exp.iloc[0]}<br><u>Category</u>: {temp_exp.iloc[4]}<br><u>Description</u>: {temp_exp.iloc[3]}<br><u>Debit/Credit</u>: {temp_exp.iloc[5]}/{temp_exp.iloc[6]}"
 
             # reset the text of the label
             self.curr_ex_label.setText(self.curr_expense)
@@ -99,8 +100,11 @@ class MainWindow(QMainWindow):
     # size of the dataframe while iterating through it
     def skip_to_next_row_df(self):
         df_size = len(self.expense_dataframe)
-        if len(df_size) != 0:
+        if df_size != 0:
             self.curr_index = (self.curr_index + 1) % df_size
+
+            # now update the current expense with the new index
+            self.set_current_expense()
         else:
             print("Expense Dataframe is empty!")
         
