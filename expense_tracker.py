@@ -52,7 +52,9 @@ class MainWindow(QMainWindow):
         sort_grid_layout.addWidget(delete_button, 2, 2)
         delete_button.clicked.connect(self.delete_current_expense)
 
-        # user will categorize the expense, so give them a drop down list of categories to choose 
+        # user will categorize the expense, so give them a drop down list of categories to choose
+        # will try to load categories if the json already exists, otherwise the user will have to
+        # create them within the program
         self.cat_combo_box = QComboBox()
         sort_grid_layout.addWidget(self.cat_combo_box, 1, 0)
         try:
@@ -83,6 +85,7 @@ class MainWindow(QMainWindow):
         # add the stack to the main window
         main_layout.addWidget(self.stack)
 
+
     def load_new_expenses(self):
         self.expense_dataframe = pd.read_csv("transactions.csv")
 
@@ -92,6 +95,7 @@ class MainWindow(QMainWindow):
 
         # Print this to confirm it loaded and updated properly
         print(self.expense_dataframe.head())
+
 
     # when the sort button is clicked set the first row of our expense dataframe to the label
     # make sure there are expenses in the dataframe first
@@ -105,6 +109,7 @@ class MainWindow(QMainWindow):
             # reset the text of the label
             self.curr_ex_label.setText(self.curr_expense)
 
+
     # the current index indicates which expense is being processed by the user;
     # make sure that there are expenses and that the index does not surpass the
     # size of the dataframe while iterating through it
@@ -117,6 +122,7 @@ class MainWindow(QMainWindow):
             self.set_current_expense()
         else:
             print("Expense Dataframe is Empty, Cannot Skip")
+
 
     # make sure there are expenses and update the current index after the delete
     def delete_current_expense(self):
@@ -145,13 +151,13 @@ class MainWindow(QMainWindow):
 
     # Override closeEvent to export to JSON on close
     def closeEvent(self, event):
-        selected_option = self.cat_combo_box.currentText()
+        categories = [self.cat_combo_box.itemText(i) for i in range(self.cat_combo_box.count())]
         data_to_save = {
-            "categories": selected_option
+            "categories": categories
         }
-        
+
         try:
-            with open("output.json", "w") as f:
+            with open("categories.json", "w") as f:
                 json.dump(data_to_save, f, indent=4)
             print("Data saved to output.json")
         except Exception as e:
@@ -180,13 +186,16 @@ class Expense:
 def load_old_expenses():
     expense_dataframe = pd.read_csv("")
 
+
 def save_expenses(analyzed_expenses):
     analyzed_expenses.to_csv("", index = False)
 
+
 def load_categories():
     with open("categories.json", "r") as f:
-        date = json.load(f)
-
+        data = json.load(f)
+        print(data["categories"])
+        return data["categories"]
 
 
 if __name__ == "__main__":
