@@ -33,8 +33,9 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(sort_grid_widget)
 
         # create text for current expense
-        curr_ex_label = QLabel(self.curr_expense)
-        sort_grid_layout.addWidget(curr_ex_label, 0, 1)
+        # made this label self. because i need it to be accessible to be changed in a function call
+        self.curr_ex_label = QLabel(self.curr_expense) 
+        sort_grid_layout.addWidget(self.curr_ex_label, 0, 0, 1, 3)
 
         # create new cateogory for sorting
         new_cat = QPushButton("Create Category")
@@ -51,7 +52,6 @@ class MainWindow(QMainWindow):
         temp_button = QPushButton("Temporary")
         self.stack.addWidget(temp_button)
 
-
         # create button that takes in csv data and add it to the sidebar
         new_transactions_button = QPushButton("Upload Transactions") # create button
         new_transactions_button.adjustSize() # resizes button so all of the text is shown
@@ -60,6 +60,7 @@ class MainWindow(QMainWindow):
 
         new_sort_button = QPushButton("Sort")
         new_sort_button.clicked.connect(lambda: self.stack.setCurrentIndex(1))
+        new_sort_button.clicked.connect(self.set_current_expense)
         sidebar.addWidget(new_sort_button)
 
         other_temp_button = QPushButton("Temporary")
@@ -73,7 +74,34 @@ class MainWindow(QMainWindow):
 
     def load_new_expenses(self):
         self.expense_dataframe = pd.read_csv("transactions.csv")
+
+        # Example: if it is a debit expense credit is nan but same as a $0 credit so change nan to 0 in these columns
+        self.expense_dataframe["Debit"] = self.expense_dataframe["Debit"].fillna(0)
+        self.expense_dataframe["Credit"] = self.expense_dataframe["Credit"].fillna(0)
+
+        # Print this to confirm it loaded and updated properly
         print(self.expense_dataframe.head())
+
+    # when the sort button is clicked set the first row of our expense dataframe to the label
+    # make sure there are expenses in the dataframe first
+    def set_current_expense(self):
+        if len(self.expense_dataframe) != 0:
+            temp_exp = self.expense_dataframe.iloc[self.curr_index] # this gets the current expense out of row self.current_index
+            #self.curr_expense = temp_exp
+            self.curr_expense = f"Date: {temp_exp[0]}  Category: {temp_exp[4]}\nDescription: {temp_exp[3]}\nDebit/Credit: {temp_exp[5]}/{temp_exp[6]}"
+
+            # reset the text of the label
+            self.curr_ex_label.setText(self.curr_expense)
+
+    # the current index indicates which expense is being processed by the user;
+    # make sure that there are expenses and that the index does not surpass the
+    # size of the dataframe while iterating through it
+    def skip_to_next_row_df(self):
+        df_size = len(self.expense_dataframe)
+        if len(df_size) != 0:
+            self.curr_index = (self.curr_index + 1) % df_size
+        else:
+            print("Expense Dataframe is empty!")
         
 
 class Expense:
