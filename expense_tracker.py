@@ -8,6 +8,7 @@ class MainWindow(QMainWindow):
         self.expense_dataframe = pd.DataFrame()
         self.curr_index = 0
         self.curr_expense = "Load Expenses"
+        self.category_expense_map = {}
 
         # create a layout for the expense tracker
         central_widget = QWidget()
@@ -57,11 +58,17 @@ class MainWindow(QMainWindow):
         # will try to load categories if the json already exists, otherwise the user will have to
         # create them within the program
         self.cat_combo_box = QComboBox()
-        sort_grid_layout.addWidget(self.cat_combo_box, 1, 0)
+        sort_grid_layout.addWidget(self.cat_combo_box, 1, 0, 1, 2)
         try:
             self.cat_combo_box.addItems(load_categories())
         except:
             pass
+
+
+        # button that confirms the category selection for an expense
+        select_cat_button = QPushButton("Select Category")
+        sort_grid_layout.addWidget(select_cat_button, 1, 2)
+        select_cat_button.clicked.connect(self.categorize_expense)
 
         temp_button = QPushButton("Temporary")
         self.stack.addWidget(temp_button)
@@ -156,6 +163,24 @@ class MainWindow(QMainWindow):
         else:
             print("Expense Dataframe is Empty, Cannot Delete")
 
+    
+    # take the category the user picked and pair it with the current expense
+    # save that pairing
+    def categorize_expense(self):
+        category = self.cat_combo_box.currentText()
+        exp = self.expense_dataframe.iloc[self.curr_index]
+
+        # determines if the expense is a credit or debit (debit will be treated as positive)
+        debit = False
+        if float(exp.iloc[5]) > 0:
+            debit = True
+
+        
+
+        if category in self.category_expense_map:
+            self.category_expense_map[category].append(exp)
+        else:
+            self.category_expense_map[category] = [exp]
 
     # Override closeEvent to export to JSON on close
     def closeEvent(self, event):
