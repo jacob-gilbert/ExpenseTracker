@@ -175,12 +175,20 @@ class MainWindow(QMainWindow):
         if float(exp.iloc[5]) > 0:
             debit = True
 
-        
-
-        if category in self.category_expense_map:
-            self.category_expense_map[category].append(exp)
+        # determine the amount, either debit or credit
+        if debit:
+            amount = exp.iloc[5]
         else:
-            self.category_expense_map[category] = [exp]
+            amount = -exp.iloc[6]
+
+        # create new instance of Expense
+        new_exp = Expense(category, exp.iloc[0], exp.iloc[3], amount)
+
+        # store the expense based on category in the dictionary
+        if category in self.category_expense_map:
+            self.category_expense_map[category].append(new_exp)
+        else:
+            self.category_expense_map[category] = [new_exp]
 
     # Override closeEvent to export to JSON on close
     def closeEvent(self, event):
@@ -201,9 +209,10 @@ class MainWindow(QMainWindow):
         
 
 class Expense:
-    def __init__(self, category, date, amount):
+    def __init__(self, category, date, place_of_purchase, amount):
         self.cat = category # what kind of expense it is
         self.dt = date # date the expense was made
+        self.place = place_of_purchase
         self.amnt = amount # the cost of the expense
 
     def get_category(self):
@@ -211,6 +220,9 @@ class Expense:
     
     def get_date(self):
         return self.dt
+    
+    def get_place(self):
+        return self.place
     
     def get_amount(self):
         return self.amnt
