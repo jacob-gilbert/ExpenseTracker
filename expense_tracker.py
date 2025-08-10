@@ -190,6 +190,9 @@ class MainWindow(QMainWindow):
         else:
             self.category_expense_map[category] = [new_exp]
 
+        # expense has been categorized, now delete it from unsorted list
+        self.delete_current_expense()
+
 
     # Override closeEvent to export to JSON on close
     def closeEvent(self, event):
