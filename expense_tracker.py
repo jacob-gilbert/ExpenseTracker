@@ -190,8 +190,11 @@ class MainWindow(QMainWindow):
         else:
             self.category_expense_map[category] = [new_exp]
 
+
     # Override closeEvent to export to JSON on close
     def closeEvent(self, event):
+
+        # prepare to save the categories to a json file
         categories = [self.cat_combo_box.itemText(i) for i in range(self.cat_combo_box.count())]
         data_to_save = {
             "categories": categories
@@ -202,7 +205,20 @@ class MainWindow(QMainWindow):
                 json.dump(data_to_save, f, indent=4)
             print("Data saved to output.json")
         except Exception as e:
-            print(f"Failed to save data: {e}")
+            print(f"Failed to save category data: {e}")
+
+        # prepare to save expenses to a json file
+        expense_dict = {}
+        
+        for key in self.category_expense_map:
+            exp_list = self.category_expense_map[key]
+            expense_dict[key] = [exp.to_dict() for exp in exp_list]
+
+        try:
+            with open("expenses.json", "w") as f:
+                json.dump(expense_dict, f, indent=4)
+        except Exception as e:
+            print(f"Failed to save expense data: {e}")
 
         # Accept the close event
         event.accept()
@@ -214,6 +230,12 @@ class Expense:
         self.dt = date # date the expense was made
         self.place = place_of_purchase
         self.amnt = amount # the cost of the expense
+
+    def __str__(self):
+        return f"Category: {self.cat}, Date: {self.dt}, Place: {self.place}, Amount: {self.amnt}"
+    
+    def to_dict(self):
+        return {"category" : self.cat, "date" : self.dt, "place" : self.place, "amount" : self.amnt}
 
     def get_category(self):
         return self.cat
