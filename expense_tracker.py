@@ -105,6 +105,10 @@ class MainWindow(QMainWindow):
         print(self.expense_dataframe.head())
 
 
+    def load_old_expenses(self):
+        pass
+
+
     # when the sort button is clicked set the first row of our expense dataframe to the label
     # make sure there are expenses in the dataframe first
     def set_current_expense(self):
@@ -264,7 +268,6 @@ def save_expenses(analyzed_expenses):
 def load_categories():
     with open("categories.json", "r") as f:
         data = json.load(f)
-        print(data["categories"])
         return data["categories"]
 
 
