@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
         upload_button = QPushButton("Upload")
         self.stack.addWidget(upload_button)
         upload_button.clicked.connect(self.load_new_expenses)
+        upload_button.clicked.connect(self.load_old_expenses)
 
         # layout for sort visuals
         sort_grid_widget = QWidget()
@@ -106,7 +107,13 @@ class MainWindow(QMainWindow):
 
 
     def load_old_expenses(self):
-        pass
+        with open("expenses.json", "r") as f:
+            data = json.load(f)
+            for key in data:
+                self.category_expense_map[key] = []
+                exps = data[key]
+                for expense in exps:
+                    self.category_expense_map[key].append(Expense(expense["category"], expense["date"], expense["place"], expense["amount"]))
 
 
     # when the sort button is clicked set the first row of our expense dataframe to the label
