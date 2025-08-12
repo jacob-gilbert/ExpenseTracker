@@ -1,6 +1,7 @@
 import pandas as pd
 import json
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog, QPlainTextEdit
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog, QPlainTextEdit, QDateEdit
+from PyQt6.QtCore import QDate
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -84,12 +85,28 @@ class MainWindow(QMainWindow):
         view_grid_layout.addWidget(self.view_cat_combo_box, 0, 0)
         self.view_cat_combo_box.addItems(["All"] + self.categories)
 
-        # Connect the signal that the user selected a new option in the combo box to the function updates the plaintextbox below it
+        # connect the signal that the user selected a new option in the combo box to the function updates the plaintextbox below it
         self.view_cat_combo_box.currentIndexChanged.connect(self.update_expenses_viewed)
+
+        # get today's date and one month before
+        today = QDate.currentDate()
+        one_month_before = today.addMonths(-1)
+
+        # start date selector
+        start_date = QDateEdit()
+        start_date.setCalendarPopup(True)
+        start_date.setDate(one_month_before)  # default: 1 month before today
+        view_grid_layout.addWidget(start_date, 1, 0)
+
+        # end date selector
+        end_date = QDateEdit()
+        end_date.setCalendarPopup(True)
+        end_date.setDate(today)  # default: today
+        view_grid_layout.addWidget(end_date, 1, 1)
 
         # create text edit in view to see all the expenses and its read only
         self.view_text_edit = QPlainTextEdit()
-        view_grid_layout.addWidget(self.view_text_edit, 1, 0)
+        view_grid_layout.addWidget(self.view_text_edit, 2, 0, 1, 2)
         self.view_text_edit.setReadOnly(True)
 
 
