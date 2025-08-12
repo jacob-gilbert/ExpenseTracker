@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog, QPlainTextEdit
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -81,11 +81,17 @@ class MainWindow(QMainWindow):
         # user will view expenses based on their category, so give them a drop down list of categories to choose from
         # will take the categories from the sort combo box
         self.view_cat_combo_box = QComboBox()
-        view_grid_layout.addWidget(self.cat_combo_box)
-        try:
-            self.view_cat_combo_box.addItems(self.categories)
-        except:
-            pass
+        view_grid_layout.addWidget(self.view_cat_combo_box, 0, 0)
+        self.view_cat_combo_box.addItems(["All"] + self.categories)
+
+        # Connect the signal that the user selected a new option in the combo box to the function updates the plaintextbox below it
+        self.view_cat_combo_box.currentIndexChanged.connect(self.update_expenses_viewed)
+
+        # create text edit in view to see all the expenses and its read only
+        self.view_text_edit = QPlainTextEdit()
+        view_grid_layout.addWidget(self.view_text_edit, 1, 0)
+        self.view_text_edit.setReadOnly(True)
+
 
         # create button that takes in csv data and add it to the sidebar
         new_transactions_button = QPushButton("Upload Transactions") # create button
@@ -98,9 +104,10 @@ class MainWindow(QMainWindow):
         new_sort_button.clicked.connect(self.set_current_expense)
         sidebar.addWidget(new_sort_button)
 
-        other_view_button = QPushButton("View")
-        sidebar.addWidget(other_view_button)
-        other_view_button.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        view_button = QPushButton("View")
+        sidebar.addWidget(view_button)
+        view_button.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        view_button.clicked.connect(self.update_expenses_viewed)
 
         sidebar.addStretch() # pushes everything to the top
 
@@ -123,7 +130,7 @@ class MainWindow(QMainWindow):
         with open("expenses.json", "r") as f:
             data = json.load(f)
             for key in data:
-                print(key)
+                #print(key)
                 self.category_expense_map[key] = []
                 exps = data[key]
                 for expense in exps:
@@ -217,6 +224,36 @@ class MainWindow(QMainWindow):
 
         # expense has been categorized, now delete it from unsorted list
         self.delete_current_expense()
+
+    
+    # update the plaintextbox in view based on the category the user chooses, when viewing all it is sorted by category
+    def update_expenses_viewed(self):
+        # verify that at least on category exists
+        if self.categories:
+            curr_cat = self.view_cat_combo_box.currentText()
+            view_text = ""
+
+            # if the current category is "All" display all expenses
+            if curr_cat == "All":
+                # iterate through the categories
+                for cat in self.category_expense_map:
+                    exps_from_cat = self.category_expense_map[cat]
+                    # for each expense, add it to the string of expenses to be viewed and newline
+                    for exp in exps_from_cat:
+                        view_text += exp.__str__()
+                        view_text += "\n\n"
+            else:
+                # put all of the expenses from the selected category into view while ignoring expenses from other categories
+                try:
+                    exps_from_cat = self.category_expense_map[curr_cat]
+                    for exp in exps_from_cat:
+                        view_text += exp.__str__()
+                        view_text += "\n\n"
+                except:
+                    view_text = "No expenses listed under this category"
+
+            # update the text box with the expenses
+            self.view_text_edit.setPlainText(view_text)
 
 
     # Override closeEvent to export to JSON on close
