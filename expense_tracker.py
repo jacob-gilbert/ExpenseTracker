@@ -61,18 +61,31 @@ class MainWindow(QMainWindow):
         self.cat_combo_box = QComboBox()
         sort_grid_layout.addWidget(self.cat_combo_box, 1, 0, 1, 2)
         try:
-            self.cat_combo_box.addItems(load_categories())
+            self.categories = load_categories()
+            self.cat_combo_box.addItems(self.categories)
         except:
             pass
-
 
         # button that confirms the category selection for an expense
         select_cat_button = QPushButton("Select Category")
         sort_grid_layout.addWidget(select_cat_button, 1, 2)
         select_cat_button.clicked.connect(self.categorize_expense)
 
-        temp_button = QPushButton("Temporary")
-        self.stack.addWidget(temp_button)
+        # view
+        # layout for view visuals
+        view_grid_widget = QWidget()
+        view_grid_layout = QGridLayout()
+        view_grid_widget.setLayout(view_grid_layout)
+        self.stack.addWidget(view_grid_widget)
+        
+        # user will view expenses based on their category, so give them a drop down list of categories to choose from
+        # will take the categories from the sort combo box
+        self.view_cat_combo_box = QComboBox()
+        view_grid_layout.addWidget(self.cat_combo_box)
+        try:
+            self.view_cat_combo_box.addItems(self.categories)
+        except:
+            pass
 
         # create button that takes in csv data and add it to the sidebar
         new_transactions_button = QPushButton("Upload Transactions") # create button
