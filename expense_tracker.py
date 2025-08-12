@@ -110,6 +110,7 @@ class MainWindow(QMainWindow):
         with open("expenses.json", "r") as f:
             data = json.load(f)
             for key in data:
+                print(key)
                 self.category_expense_map[key] = []
                 exps = data[key]
                 for expense in exps:
@@ -220,6 +221,13 @@ class MainWindow(QMainWindow):
             print("Data saved to output.json")
         except Exception as e:
             print(f"Failed to save category data: {e}")
+
+        # if the category_expense_map is empty do not write to expenses.json
+        # if no expenses are loaded this prevents the program from writing to the file as it
+        # may delete expenses that exist but weren't uploaded to the program
+        if not self.category_expense_map:
+            event.accept()
+            return
 
         # prepare to save expenses to a json file
         expense_dict = {}
