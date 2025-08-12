@@ -109,6 +109,9 @@ class MainWindow(QMainWindow):
         # connect the signal that the user selected a new option in the combo box to the function updates the plaintextbox below it
         self.view_cat_combo_box.currentIndexChanged.connect(lambda: self.update_expenses_viewed(start_date.date(), end_date.date()))
 
+        # connect the signal that the user updated the time range to the function that updates which expenses are displayed
+        start_date.dateChanged.connect(lambda: self.update_expenses_viewed(start_date.date(), end_date.date()))
+        end_date.dateChanged.connect(lambda: self.update_expenses_viewed(start_date.date(), end_date.date()))
 
         # create button that takes in csv data and add it to the sidebar
         new_transactions_button = QPushButton("Upload Transactions") # create button
