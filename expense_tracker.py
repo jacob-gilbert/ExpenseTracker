@@ -85,9 +85,9 @@ class MainWindow(QMainWindow):
         new_sort_button.clicked.connect(self.set_current_expense)
         sidebar.addWidget(new_sort_button)
 
-        other_temp_button = QPushButton("Temporary")
-        sidebar.addWidget(other_temp_button)
-        other_temp_button.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        other_view_button = QPushButton("View")
+        sidebar.addWidget(other_view_button)
+        other_view_button.clicked.connect(lambda: self.stack.setCurrentIndex(2))
 
         sidebar.addStretch() # pushes everything to the top
 
