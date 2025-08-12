@@ -270,8 +270,14 @@ class MainWindow(QMainWindow):
                 try:
                     exps_from_cat = self.category_expense_map[curr_cat]
                     for exp in exps_from_cat:
-                        view_text += exp.__str__()
-                        view_text += "\n\n"
+                        # convert the expense's date a QDate
+                        expense_date = QDate.fromString(exp.get_date(), "yyyy-MM-dd")
+
+                        # compare the date to the date time range
+                        # if within the range add the expense to be displayed
+                        if start <= expense_date <= end:
+                            view_text += exp.__str__()
+                            view_text += "\n\n"
                 except:
                     view_text = "No expenses listed under this category"
 
