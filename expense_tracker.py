@@ -85,9 +85,6 @@ class MainWindow(QMainWindow):
         view_grid_layout.addWidget(self.view_cat_combo_box, 0, 0)
         self.view_cat_combo_box.addItems(["All"] + self.categories)
 
-        # connect the signal that the user selected a new option in the combo box to the function updates the plaintextbox below it
-        self.view_cat_combo_box.currentIndexChanged.connect(self.update_expenses_viewed)
-
         # get today's date and one month before
         today = QDate.currentDate()
         one_month_before = today.addMonths(-1)
@@ -109,6 +106,9 @@ class MainWindow(QMainWindow):
         view_grid_layout.addWidget(self.view_text_edit, 2, 0, 1, 2)
         self.view_text_edit.setReadOnly(True)
 
+        # connect the signal that the user selected a new option in the combo box to the function updates the plaintextbox below it
+        self.view_cat_combo_box.currentIndexChanged.connect(lambda: self.update_expenses_viewed(start_date.date(), end_date.date()))
+
 
         # create button that takes in csv data and add it to the sidebar
         new_transactions_button = QPushButton("Upload Transactions") # create button
@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
         view_button = QPushButton("View")
         sidebar.addWidget(view_button)
         view_button.clicked.connect(lambda: self.stack.setCurrentIndex(2))
-        view_button.clicked.connect(self.update_expenses_viewed)
+        view_button.clicked.connect(lambda: self.update_expenses_viewed(start_date.date(), end_date.date()))
 
         sidebar.addStretch() # pushes everything to the top
 
@@ -244,7 +244,7 @@ class MainWindow(QMainWindow):
 
     
     # update the plaintextbox in view based on the category the user chooses, when viewing all it is sorted by category
-    def update_expenses_viewed(self):
+    def update_expenses_viewed(self, start, end):
         # verify that at least on category exists
         if self.categories:
             curr_cat = self.view_cat_combo_box.currentText()
@@ -257,8 +257,14 @@ class MainWindow(QMainWindow):
                     exps_from_cat = self.category_expense_map[cat]
                     # for each expense, add it to the string of expenses to be viewed and newline
                     for exp in exps_from_cat:
-                        view_text += exp.__str__()
-                        view_text += "\n\n"
+                        # convert the expense's date a QDate
+                        expense_date = QDate.fromString(exp.get_date(), "yyyy-MM-dd")
+
+                        # compare the date to the date time range
+                        # if within the range add the expense to be displayed
+                        if start <= expense_date <= end:
+                            view_text += exp.__str__()
+                            view_text += "\n\n"
             else:
                 # put all of the expenses from the selected category into view while ignoring expenses from other categories
                 try:
