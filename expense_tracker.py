@@ -316,7 +316,7 @@ class MainWindow(QMainWindow):
             # update the text box with the expenses
             self.view_text_edit.setPlainText(view_text)
 
-    
+    # calculates the total expenses spent in every category and all combined to be displayed
     def update_totals(self, start, end):
         # display all existing category totals
         # iterate through the categories
@@ -338,6 +338,9 @@ class MainWindow(QMainWindow):
 
         # after the for loop every category's total has been calculated and added together into all_total var
         first_text += f"{all_total}\n\n"
+
+        # update the text box with the total
+        self.total_text_edit.setPlainText(first_text + running_text)
 
 
 
