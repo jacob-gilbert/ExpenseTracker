@@ -157,6 +157,11 @@ class MainWindow(QMainWindow):
         total_button = QPushButton("Total")
         sidebar.addWidget(total_button)
         total_button.clicked.connect(lambda: self.stack.setCurrentIndex(3))
+        total_button.clicked.connect(lambda: self.update_totals(total_start_date.date(), total_end_date.date()))
+
+        # connect the signal that the user updated the time range to the function that updates which expenses are displayed
+        total_start_date.dateChanged.connect(lambda: self.update_totals(total_start_date.date(), total_end_date.date()))
+        total_end_date.dateChanged.connect(lambda: self.update_totals(total_start_date.date(), total_end_date.date()))
 
         sidebar.addStretch() # pushes everything to the top
 
@@ -319,9 +324,7 @@ class MainWindow(QMainWindow):
     # calculates the total expenses spent in every category and all combined to be displayed including
     # only expenses who's date falls between the start and end date range
     def update_totals(self, start, end):
-        # display all existing category totals
-        # iterate through the categories
-        first_text = "Total Spend: "
+        first_text = "Total Spend: $"
         running_text = ""
         all_total = 0
         for cat in self.category_expense_map:
@@ -338,7 +341,7 @@ class MainWindow(QMainWindow):
                 if start <= expense_date <= end:
                     cat_total = int(exp.get_amount())
 
-            running_text += f"{cat} Total Spend: {cat_total}"
+            running_text += f"{cat} Total Spend: ${cat_total}"
             running_text += "\n\n"
 
             all_total += cat_total
