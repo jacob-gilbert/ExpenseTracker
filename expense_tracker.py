@@ -417,14 +417,6 @@ class Expense:
         return self.amnt
 
 
-def load_old_expenses():
-    expense_dataframe = pd.read_csv("")
-
-
-def save_expenses(analyzed_expenses):
-    analyzed_expenses.to_csv("", index = False)
-
-
 def load_categories():
     with open("categories.json", "r") as f:
         data = json.load(f)
