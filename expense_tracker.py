@@ -106,6 +106,31 @@ class MainWindow(QMainWindow):
         view_grid_layout.addWidget(self.view_text_edit, 2, 0, 1, 2)
         self.view_text_edit.setReadOnly(True)
 
+
+        # total
+        # layout for total visuals
+        total_grid_widget = QWidget()
+        total_grid_layout = QGridLayout()
+        total_grid_widget.setLayout(total_grid_layout)
+        self.stack.addWidget(total_grid_widget)
+
+        # start date selector
+        total_start_date = QDateEdit()
+        total_start_date.setCalendarPopup(True)
+        total_start_date.setDate(one_month_before)  # default: 1 month before today
+        total_grid_layout.addWidget(total_start_date, 0, 0)
+
+        # end date selector
+        total_end_date = QDateEdit()
+        total_end_date.setCalendarPopup(True)
+        total_end_date.setDate(today)  # default: today
+        total_grid_layout.addWidget(total_end_date, 0, 1)
+
+        # create text edit in view to see all the expenses and its read only
+        self.total_text_edit = QPlainTextEdit()
+        total_grid_layout.addWidget(self.total_text_edit, 1, 0, 1, 2)
+        self.total_text_edit.setReadOnly(True)
+
         # connect the signal that the user selected a new option in the combo box to the function updates the plaintextbox below it
         self.view_cat_combo_box.currentIndexChanged.connect(lambda: self.update_expenses_viewed(start_date.date(), end_date.date()))
 
@@ -128,6 +153,10 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(view_button)
         view_button.clicked.connect(lambda: self.stack.setCurrentIndex(2))
         view_button.clicked.connect(lambda: self.update_expenses_viewed(start_date.date(), end_date.date()))
+
+        total_button = QPushButton("Total")
+        sidebar.addWidget(total_button)
+        total_button.clicked.connect(lambda: self.stack.setCurrentIndex(3))
 
         sidebar.addStretch() # pushes everything to the top
 
@@ -286,6 +315,30 @@ class MainWindow(QMainWindow):
 
             # update the text box with the expenses
             self.view_text_edit.setPlainText(view_text)
+
+    
+    def update_totals(self, start, end):
+        # display all existing category totals
+        # iterate through the categories
+        first_text = "Total Spend: "
+        running_text = ""
+        all_total = 0
+        for cat in self.category_expense_map:
+            exps_from_cat = self.category_expense_map[cat]
+
+            # for each expense, # add the expense's total to the running total of all expenses in that category
+            cat_total = 0
+            for exp in exps_from_cat:
+                cat_total = int(exp.get_amount())
+
+            running_text += f"{cat} Total Spend: {cat_total}"
+            running_text += "\n\n"
+
+            all_total += cat_total
+
+        # after the for loop every category's total has been calculated and added together into all_total var
+        first_text += f"{all_total}\n\n"
+
 
 
     # Override closeEvent to export to JSON on close
