@@ -316,7 +316,8 @@ class MainWindow(QMainWindow):
             # update the text box with the expenses
             self.view_text_edit.setPlainText(view_text)
 
-    # calculates the total expenses spent in every category and all combined to be displayed
+    # calculates the total expenses spent in every category and all combined to be displayed including
+    # only expenses who's date falls between the start and end date range
     def update_totals(self, start, end):
         # display all existing category totals
         # iterate through the categories
@@ -326,10 +327,16 @@ class MainWindow(QMainWindow):
         for cat in self.category_expense_map:
             exps_from_cat = self.category_expense_map[cat]
 
-            # for each expense, # add the expense's total to the running total of all expenses in that category
+            # for each expense, add the expense's total to the running total of all expenses in that category
             cat_total = 0
             for exp in exps_from_cat:
-                cat_total = int(exp.get_amount())
+                # convert the expense's date a QDate
+                expense_date = QDate.fromString(exp.get_date(), "yyyy-MM-dd")
+
+                # compare the date to the date time range
+                # if within the range add the expense to the total
+                if start <= expense_date <= end:
+                    cat_total = int(exp.get_amount())
 
             running_text += f"{cat} Total Spend: {cat_total}"
             running_text += "\n\n"
