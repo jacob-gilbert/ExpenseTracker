@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog, QPlainTextEdit, QDateEdit
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog, QPlainTextEdit, QDateEdit, QFileDialog
 from PyQt6.QtCore import Qt, QDate
 
 from expense import Expense
@@ -79,11 +79,16 @@ class MainWindow(QMainWindow):
         #upload_button.clicked.connect(self.load_new_expenses)
         upload_button.clicked.connect(self.load_old_expenses)
 
-        # -------------------
         # Drop Label
-        # -------------------
         self.drop_label = DropLabel(self)
         upload_grid_layout.addWidget(self.drop_label)
+
+        # Browse button
+        browse_button = QPushButton("Browse CSV")
+        browse_button.clicked.connect(self.browse_csv)
+        # Add it to the same layout where your drop_label is
+        upload_grid_layout.addWidget(browse_button, 2, 0)  # adjust row/column as needed
+    
 
         # -------------------
         # Sort Widget
@@ -209,6 +214,13 @@ class MainWindow(QMainWindow):
 
     def load_old_expenses(self):
         self.category_expense_map = dh.load_old_expenses()
+
+    def browse_csv(self):
+        df, file_path = dh.browse_and_load_csv(self)
+        if df is not None:
+            self.expense_dataframe = df
+            self.drop_label.setText(f"Loaded: {file_path}")
+            print(self.expense_dataframe.head())
 
     def create_new_cat(self):
         lg.create_new_cat(self)

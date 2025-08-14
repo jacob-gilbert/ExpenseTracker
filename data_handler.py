@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 from expense import Expense
+from PyQt6.QtWidgets import QFileDialog
 
 def load_new_expenses(file_path="transactions.csv"):
     """
@@ -34,6 +35,24 @@ def load_old_expenses():
         pass
 
     return category_expense_map
+
+def browse_and_load_csv(parent=None):
+    """
+    Opens a file dialog to select a CSV and returns a loaded DataFrame.
+    parent: QWidget that will own the dialog
+    """
+    file_path, _ = QFileDialog.getOpenFileName(
+        parent,
+        "Select CSV file",
+        "",
+        "CSV Files (*.csv)"
+    )
+    if file_path:
+        df = pd.read_csv(file_path)
+        df["Debit"] = df["Debit"].fillna(0)
+        df["Credit"] = df["Credit"].fillna(0)
+        return df, file_path
+    return None, None
 
 def load_categories():
     """
