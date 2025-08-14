@@ -1,9 +1,41 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QComboBox, QInputDialog, QPlainTextEdit, QDateEdit
-from PyQt6.QtCore import QDate
+from PyQt6.QtCore import Qt, QDate
 
 from expense import Expense
 import data_handler as dh
 import logic as lg
+
+class DropLabel(QLabel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setText("Drop CSV file here")
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setStyleSheet("border: 2px dashed gray; padding: 40px; font-size: 16px;")
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                if url.toLocalFile().endswith('.csv'):
+                    self.setStyleSheet("border: 2px dashed green; padding: 40px; font-size: 16px;")
+                    event.acceptProposedAction()
+                    return
+        event.ignore()
+
+    def dropEvent(self, event):
+        for url in event.mimeData().urls():
+            file_path = url.toLocalFile()
+            if file_path.endswith('.csv'):
+                # Calls MainWindow method
+                self.load_csv(file_path)
+                self.setText(f"Loaded: {file_path}")
+
+    def dragLeaveEvent(self, event):
+        self.setStyleSheet("border: 2px dashed gray; padding: 40px; font-size: 16px;")
+
+    def load_csv(self, file_path):
+        self.expense_dataframe = dh.load_new_expenses(file_path)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -37,10 +69,21 @@ class MainWindow(QMainWindow):
         # -------------------
         # Upload Widget
         # -------------------
-        upload_button = QPushButton("Upload")
-        self.stack.addWidget(upload_button)
-        upload_button.clicked.connect(self.load_new_expenses)
+        upload_grid_widget = QWidget()
+        upload_grid_layout = QGridLayout()
+        upload_grid_widget.setLayout(upload_grid_layout)
+        self.stack.addWidget(upload_grid_widget)
+
+        upload_button = QPushButton("Upload Old Expenses")
+        upload_grid_layout.addWidget(upload_button)
+        #upload_button.clicked.connect(self.load_new_expenses)
         upload_button.clicked.connect(self.load_old_expenses)
+
+        # -------------------
+        # Drop Label
+        # -------------------
+        self.drop_label = DropLabel(self)
+        upload_grid_layout.addWidget(self.drop_label)
 
         # -------------------
         # Sort Widget
