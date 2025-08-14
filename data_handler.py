@@ -2,12 +2,12 @@ import pandas as pd
 import json
 from expense import Expense
 
-def load_new_expenses():
+def load_new_expenses(file_path="transactions.csv"):
     """
     Loads transactions.csv into a dataframe and fills NaN values with 0.
     Returns the dataframe.
     """
-    expense_dataframe = pd.read_csv("transactions.csv")
+    expense_dataframe = pd.read_csv(file_path)
     expense_dataframe["Debit"] = expense_dataframe["Debit"].fillna(0)
     expense_dataframe["Credit"] = expense_dataframe["Credit"].fillna(0)
     return expense_dataframe
